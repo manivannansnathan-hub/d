@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>D - A Tool to Sharpen Your Needs</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root { font-family: "DM Sans", sans-serif; color: #102f4d; background: #0b2d4e; font-synthesis: none; }
+    * { box-sizing: border-box; }
+    body { min-width: 320px; min-height: 100vh; margin: 0; }
+    button { font: inherit; }
+
+    .site-shell {
+      position: relative; isolation: isolate; overflow: hidden; min-height: 100vh;
+      display: grid; place-items: center; padding: 40px 24px 32px;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(135deg, #0b2d4e 0%, #24577f 54%, #7897b0 100%);
+      background-size: 48px 48px, 48px 48px, auto;
+    }
+    .site-shell::before, .site-shell::after {
+      content: ""; position: absolute; z-index: -2; width: min(31vw, 420px); aspect-ratio: 2 / 3;
+      background-image: url("https://images.unsplash.com/photo-1682802247486-76fb26d6b0e1?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&q=80&w=900");
+      background-position: center; background-size: cover; filter: saturate(.75);
+      mask-image: radial-gradient(ellipse, #000 34%, transparent 75%);
+      opacity: .15; mix-blend-mode: screen; pointer-events: none;
+    }
+    .site-shell::before { top: -10%; left: -6%; transform: rotate(-11deg); }
+    .site-shell::after { right: -5%; bottom: -15%; transform: rotate(169deg); }
+
+    .bulb-image {
+      position: absolute; z-index: -2; width: min(23vw, 300px); aspect-ratio: 1.55;
+      background-image: url("https://images.unsplash.com/photo-1769447386115-d83f1c26b97a?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&q=80&w=800");
+      background-position: center; background-size: cover; filter: grayscale(.45) saturate(.55);
+      mask-image: radial-gradient(ellipse, #000 24%, transparent 72%);
+      opacity: .13; mix-blend-mode: screen; pointer-events: none;
+    }
+    .bulb-image--left { bottom: 10%; left: 1%; transform: rotate(-5deg); }
+    .bulb-image--right { top: 12%; right: 1%; transform: rotate(6deg); }
+
+    .learning-shell { position: relative; z-index: 1; width: min(1080px, 100%); }
+
+    .brand {
+      position: relative; isolation: isolate; min-height: 245px; display: flex;
+      align-items: center; justify-content: center; flex-direction: column;
+      margin-bottom: 14px; text-align: center;
+    }
+    .brand::before {
+      content: ""; position: absolute; z-index: -1; top: 50%; left: 50%;
+      width: min(650px, 94vw); height: 270px; border-radius: 50%;
+      background-image:
+        linear-gradient(90deg, rgba(11,45,78,.9), rgba(11,45,78,.08) 42%, rgba(11,45,78,.12) 62%, rgba(11,45,78,.88)),
+        url("https://images.unsplash.com/photo-1689915971980-c2f5b34fe902?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&q=88&w=1200");
+      background-position: center; background-size: cover;
+      box-shadow: 0 22px 60px rgba(4,24,42,.24); filter: saturate(.88) contrast(1.05);
+      mask-image: radial-gradient(ellipse, #000 51%, transparent 78%);
+      opacity: .82; transform: translate(-50%, -50%); pointer-events: none;
+    }
+    .brand__mark {
+      font-family: "Playfair Display", serif; color: #dc2938;
+      font-size: clamp(82px, 10vw, 118px); font-weight: 800; line-height: .82; letter-spacing: -.06em;
+      text-shadow: 0 2px 0 rgba(255,255,255,.9), 0 10px 28px rgba(3,19,34,.35);
+    }
+    .brand__tagline {
+      position: relative; margin: 20px 0 0; padding-bottom: 14px; color: #fff;
+      font-size: clamp(14px, 2vw, 17px); font-weight: 600; letter-spacing: .1em;
+      text-shadow: 0 2px 12px rgba(3,19,34,.65);
+    }
+    .brand__tagline::after {
+      content: ""; position: absolute; bottom: 0; left: 50%; width: 44px; height: 3px;
+      border-radius: 3px; background: #dc2938; transform: translateX(-50%);
+    }
+
+    .content { min-height: 205px; }
+    .content__toolbar { height: 46px; display: flex; align-items: flex-start; }
+    .back-button {
+      width: 38px; height: 38px; display: grid; place-items: center; padding: 0;
+      border: 1px solid rgba(255,255,255,.48); border-radius: 50%; color: #fff;
+      background: rgba(7,38,66,.62); box-shadow: 0 7px 18px rgba(5,29,51,.2);
+      cursor: pointer; font-size: 20px; transition: transform .18s ease, background .18s ease;
+    }
+    .back-button:hover, .back-button:focus-visible {
+      transform: translateX(-3px); background: #dc2938; outline: 3px solid rgba(255,255,255,.22);
+    }
+
+    .card-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .card-grid--four { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .nav-card {
+      position: relative; overflow: hidden; min-height: 128px; display: flex;
+      align-items: center; justify-content: space-between; padding: 27px 28px;
+      border: 1px solid rgba(255,255,255,.82); border-radius: 10px; color: #123b60; background: #fff;
+      box-shadow: 0 16px 40px rgba(3,27,48,.18), inset 0 0 0 1px rgba(19,76,122,.04);
+      cursor: pointer; font-size: clamp(16px, 2vw, 20px); font-weight: 700; letter-spacing: .055em; text-align: left;
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, color .18s ease;
+    }
+    .nav-card::before {
+      content: ""; position: absolute; top: 0; right: 0; left: 0; height: 4px;
+      background: linear-gradient(90deg, #195c91, #4b8ab7); transition: height .18s ease;
+    }
+    .nav-card:hover, .nav-card:focus-visible {
+      transform: translateY(-5px); border-color: #afcae0; color: #0c5790;
+      box-shadow: 0 22px 46px rgba(3,27,48,.27); outline: none;
+    }
+    .nav-card:hover::before { height: 6px; }
+    .nav-card__arrow {
+      display: grid; flex: 0 0 auto; place-items: center; width: 36px; height: 36px; margin-left: 12px;
+      border-radius: 50%; color: #fff; background: #195c91; font-size: 18px;
+      box-shadow: 0 6px 14px rgba(25,92,145,.23); transition: transform .18s ease, background .18s ease;
+    }
+    .nav-card:hover .nav-card__arrow { transform: translateX(3px); background: #dc2938; }
+
+    .access-panel {
+      min-height: 168px; display: flex; align-items: center; justify-content: space-between; gap: 30px;
+      padding: 34px 38px; border: 1px solid rgba(255,255,255,.82); border-left: 6px solid #dc2938;
+      border-radius: 10px; background: #fff; box-shadow: 0 18px 42px rgba(3,27,48,.2);
+    }
+    .access-panel__topic { color: #123b60; font-size: clamp(20px, 3vw, 28px); font-weight: 700; letter-spacing: .045em; }
+    .payment-flow { display: flex; align-items: center; gap: 15px; }
+    .payment-flow__step {
+      min-width: 92px; display: grid; gap: 4px; color: #60778d;
+      font-size: 11px; font-weight: 700; letter-spacing: .12em;
+    }
+    .payment-flow__step strong { color: #123b60; font-size: 22px; letter-spacing: 0; }
+    .payment-flow__arrow { color: #8ca2b6; }
+    .action-button {
+      min-width: 112px; min-height: 50px; padding: 0 22px; border: 1px solid #195c91; border-radius: 7px;
+      color: #fff; background: #195c91; box-shadow: 0 7px 16px rgba(25,92,145,.2); cursor: pointer;
+      font-size: 13px; font-weight: 700; letter-spacing: .08em; transition: background .18s ease, transform .18s ease;
+    }
+    .action-button:hover, .action-button:focus-visible {
+      background: #114872; transform: translateY(-2px); outline: 3px solid rgba(25,92,145,.16);
+    }
+    .action-button--locked { color: #8799aa; border-color: #d1dce7; background: #eef3f7; box-shadow: none; cursor: not-allowed; }
+    .action-button--locked:hover { background: #eef3f7; transform: none; outline: none; }
+
+    .video-page { display: grid; gap: 18px; }
+    .video-page__head {
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+      padding: 22px 28px; border: 1px solid rgba(255,255,255,.82); border-left: 6px solid #dc2938;
+      border-radius: 10px; background: #fff; box-shadow: 0 18px 42px rgba(3,27,48,.2);
+    }
+    .video-page__title { margin: 0; color: #123b60; font-size: clamp(20px, 3vw, 28px); font-weight: 700; letter-spacing: .045em; }
+    .video-page__count { color: #60778d; font-size: 13px; font-weight: 700; letter-spacing: .08em; }
+    .video-page__body { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+    .video-player {
+      position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 10px;
+      background: #0b2d4e; border: 1px solid rgba(255,255,255,.5); box-shadow: 0 18px 42px rgba(3,27,48,.3);
+    }
+    .video-player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    .video-player__empty {
+      position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 10px;
+      color: #fff; text-align: center; padding: 20px;
+    }
+    .video-player__play {
+      width: 64px; height: 64px; display: grid; place-items: center; border-radius: 50%;
+      background: #dc2938; font-size: 26px; box-shadow: 0 10px 26px rgba(220,41,56,.4);
+    }
+    .video-player__empty p { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: .06em; }
+    .video-now { margin: 12px 4px 0; color: #fff; font-size: 17px; font-weight: 700; letter-spacing: .03em; text-shadow: 0 2px 12px rgba(3,19,34,.5); }
+    .lesson-list { display: grid; gap: 10px; }
+    .lesson {
+      display: flex; align-items: center; gap: 14px; width: 100%; padding: 14px 16px;
+      border: 1px solid rgba(255,255,255,.82); border-radius: 9px; color: #123b60; background: #fff;
+      box-shadow: 0 10px 26px rgba(3,27,48,.16); cursor: pointer; text-align: left;
+      font-size: 14px; font-weight: 600; letter-spacing: .02em;
+      transition: transform .18s ease, border-color .18s ease;
+    }
+    .lesson:hover, .lesson:focus-visible { transform: translateX(3px); border-color: #afcae0; outline: none; }
+    .lesson__num {
+      flex: 0 0 auto; width: 32px; height: 32px; display: grid; place-items: center; border-radius: 50%;
+      color: #fff; background: #195c91; font-size: 13px; font-weight: 700;
+    }
+    .lesson__time { margin-left: auto; color: #60778d; font-size: 12px; font-weight: 600; }
+    .lesson--active { border-left: 5px solid #dc2938; }
+    .lesson--active .lesson__num { background: #dc2938; }
+    .video-empty {
+      margin: 0; padding: 34px 38px; border-radius: 10px; background: #fff; color: #123b60;
+      border-left: 6px solid #dc2938; font-weight: 600; box-shadow: 0 18px 42px rgba(3,27,48,.2);
+    }
+    @media (max-width: 720px) {
+      .video-page__body { grid-template-columns: 1fr; }
+      .video-page__head { padding: 18px 20px; }
+    }
+
+    .contact {
+      display: flex; align-items: center; justify-content: space-between; gap: 24px;
+      margin-top: 30px; padding: 20px 25px; border: 1px solid rgba(255,255,255,.8); border-radius: 9px;
+      color: #153b5d; background: rgba(255,255,255,.94); box-shadow: 0 14px 34px rgba(3,27,48,.17);
+    }
+    .contact__name { padding-left: 13px; border-left: 3px solid #dc2938; font-size: 16px; font-weight: 700; letter-spacing: .025em; }
+    .contact__details { display: flex; align-items: center; margin: 0; font-size: 14px; font-style: normal; font-weight: 500; }
+    .contact__details > * { padding: 0 17px; }
+    .contact__details > * + * { border-left: 1px solid #cbd8e4; }
+    .contact__details a { color: inherit; text-decoration: none; transition: color .18s ease; }
+    .contact__details a:hover, .contact__details a:focus-visible { color: #c52231; outline: none; }
+
+    @media (max-width: 720px) {
+      .site-shell { align-items: start; padding: 24px 16px; }
+      .site-shell::before, .site-shell::after { width: 72vw; opacity: .1; }
+      .bulb-image { width: 62vw; opacity: .07; }
+      .bulb-image--left { bottom: 24%; left: -28%; }
+      .bulb-image--right { top: 22%; right: -30%; }
+      .brand { min-height: 220px; margin-bottom: 8px; }
+      .brand::before { width: 112vw; height: 235px; opacity: .78; }
+      .brand__tagline { max-width: 90%; line-height: 1.5; }
+      .card-grid { grid-template-columns: 1fr; gap: 12px; }
+      .nav-card { min-height: 86px; padding: 19px 21px; }
+      .content { min-height: 0; }
+      .content__toolbar { height: 48px; }
+      .access-panel { min-height: 0; align-items: stretch; flex-direction: column; padding: 26px 22px; }
+      .payment-flow { align-items: stretch; flex-direction: column; }
+      .payment-flow__arrow { display: none; }
+      .action-button { width: 100%; }
+      .contact, .contact__details { align-items: flex-start; flex-direction: column; }
+      .contact { gap: 14px; margin-top: 22px; padding: 19px 21px; }
+      .contact__details { gap: 8px; }
+      .contact__details > * { padding: 0; }
+      .contact__details > * + * { border-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <main class="site-shell">
+    <div class="bulb-image bulb-image--left" aria-hidden="true"></div>
+    <div class="bulb-image bulb-image--right" aria-hidden="true"></div>
+
+    <section class="learning-shell" aria-label="D education platform">
+      <header class="brand">
+        <div class="brand__mark">D</div>
+        <p class="brand__tagline">A Tool to Sharpen Your Needs</p>
+      </header>
+
+      <div class="content" id="content"></div>
+
+      <footer class="contact">
+        <div class="contact__name">M Senthil nathan</div>
+        <address class="contact__details">
+          <span>Vridhachalam</span>
+          <a href="tel:+916383688423">6383688423</a>
+          <a href="mailto:manivannansnathan@gmail.com">manivannansnathan@gmail.com</a>
+        </address>
+      </footer>
+    </section>
+  </main>
+
+  <script>
+    // Test fees live here so they can be changed without touching the interface.
+    const curriculum = {
+      NEET: [
+        { name: "PHYSICS", topics: [{ name: "MECHANICS" }, { name: "THERMODYNAMICS", paidTest: true, fee: 149 }, { name: "ELECTRODYNAMICS" }] },
+        { name: "CHEMISTRY", topics: [{ name: "PHYSICAL CHEMISTRY" }, { name: "ORGANIC CHEMISTRY", paidTest: true, fee: 149 }, { name: "INORGANIC CHEMISTRY" }] },
+        { name: "BOTANY", topics: [{ name: "PLANT KINGDOM" }, { name: "PHOTOSYNTHESIS", paidTest: true, fee: 149 }, { name: "PLANT GROWTH AND DEVELOPMENT" }] },
+        { name: "ZOOLOGY", topics: [{ name: "ANIMAL KINGDOM" }, { name: "STRUCTURAL ORGANISATION IN ANIMALS" }, { name: "HUMAN PHYSIOLOGY", paidTest: true, fee: 149 }] },
+      ],
+      TNPSC: [
+        { name: "GENERAL STUDIES", topics: [{ name: "INDIAN HISTORY" }, { name: "INDIAN POLITY", paidTest: true, fee: 99 }, { name: "GEOGRAPHY" }] },
+        { name: "APTITUDE", topics: [{ name: "NUMBER SYSTEM" }, { name: "PERCENTAGE", paidTest: true, fee: 99 }, { name: "REASONING" }] },
+        { name: "TAMIL", topics: [{ name: "GRAMMAR" }, { name: "LITERATURE", paidTest: true, fee: 99 }, { name: "COMPREHENSION" }] },
+      ],
+      TET: [
+        { name: "CHILD DEVELOPMENT", topics: [{ name: "LEARNING" }, { name: "PEDAGOGY", paidTest: true, fee: 79 }, { name: "INCLUSIVE EDUCATION" }] },
+        { name: "MATHEMATICS", topics: [{ name: "NUMBER CONCEPTS" }, { name: "GEOMETRY", paidTest: true, fee: 79 }, { name: "PROBLEM SOLVING" }] },
+        { name: "ENVIRONMENTAL STUDIES", topics: [{ name: "FAMILY AND FRIENDS" }, { name: "FOOD AND SHELTER", paidTest: true, fee: 79 }, { name: "WATER AND TRAVEL" }] },
+      ],
+    };
+    const learningTypes = ["VIDEO", "PDF", "TEST"];
+
+    // VIDEO lessons per topic. To add a real video, paste the YouTube video ID
+    // (the part after "v=" in the link) into youtubeId. Empty = "coming soon" placeholder.
+    const videoLessons = {
+      "MECHANICS": [
+        { title: "Units and Measurements", time: "", youtubeId: "" },
+        { title: "Laws of Motion", time: "", youtubeId: "" },
+        { title: "Work, Energy and Power", time: "", youtubeId: "" },
+      ],
+      "THERMODYNAMICS": [
+        { title: "Laws of Thermodynamics", time: "", youtubeId: "" },
+        { title: "Heat Engines and Carnot Cycle", time: "", youtubeId: "" },
+        { title: "Kinetic Theory of Gases", time: "", youtubeId: "" },
+      ],
+      "ELECTRODYNAMICS": [
+        { title: "Electric Charges and Fields", time: "", youtubeId: "" },
+        { title: "Current Electricity", time: "", youtubeId: "" },
+        { title: "Electromagnetic Induction", time: "", youtubeId: "" },
+      ],
+      "PHYSICAL CHEMISTRY": [
+        { title: "Mole Concept", time: "", youtubeId: "" },
+        { title: "Chemical Equilibrium", time: "", youtubeId: "" },
+        { title: "Chemical Kinetics", time: "", youtubeId: "" },
+      ],
+      "ORGANIC CHEMISTRY": [
+        { title: "General Organic Chemistry", time: "", youtubeId: "" },
+        { title: "Hydrocarbons", time: "", youtubeId: "" },
+        { title: "Aldehydes and Ketones", time: "", youtubeId: "" },
+      ],
+      "INORGANIC CHEMISTRY": [
+        { title: "Periodic Table and Trends", time: "", youtubeId: "" },
+        { title: "Chemical Bonding", time: "", youtubeId: "" },
+        { title: "Coordination Compounds", time: "", youtubeId: "" },
+      ],
+      "PLANT KINGDOM": [
+        { title: "Algae", time: "", youtubeId: "" },
+        { title: "Bryophytes and Pteridophytes", time: "", youtubeId: "" },
+        { title: "Gymnosperms and Angiosperms", time: "", youtubeId: "" },
+      ],
+      "PHOTOSYNTHESIS": [
+        { title: "Light Reaction", time: "", youtubeId: "" },
+        { title: "Calvin Cycle", time: "", youtubeId: "" },
+        { title: "C4 Pathway and Photorespiration", time: "", youtubeId: "" },
+      ],
+      "PLANT GROWTH AND DEVELOPMENT": [
+        { title: "Plant Growth Regulators", time: "", youtubeId: "" },
+        { title: "Photoperiodism and Vernalisation", time: "", youtubeId: "" },
+        { title: "Seed Dormancy and Germination", time: "", youtubeId: "" },
+      ],
+      "ANIMAL KINGDOM": [
+        { title: "Basis of Classification", time: "", youtubeId: "" },
+        { title: "Non-Chordates", time: "", youtubeId: "" },
+        { title: "Chordates", time: "", youtubeId: "" },
+      ],
+      "STRUCTURAL ORGANISATION IN ANIMALS": [
+        { title: "Animal Tissues", time: "", youtubeId: "" },
+        { title: "Cockroach", time: "", youtubeId: "" },
+        { title: "Frog", time: "", youtubeId: "" },
+      ],
+      "HUMAN PHYSIOLOGY": [
+        { title: "Digestion and Absorption", time: "", youtubeId: "" },
+        { title: "Breathing and Exchange of Gases", time: "", youtubeId: "" },
+        { title: "Neural Control and Coordination", time: "", youtubeId: "" },
+      ],
+    };
+
+    const state = { exam: null, type: null, subject: null, topic: null, paid: false, view: null, lesson: 0 };
+    const root = document.getElementById("content");
+
+    function el(tag, className, text) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      if (text !== undefined) node.textContent = text;
+      return node;
+    }
+
+    function navCard(label, onClick) {
+      const btn = el("button", "nav-card");
+      btn.type = "button";
+      btn.append(el("span", "", label));
+      const arrow = el("span", "nav-card__arrow", "→");
+      arrow.setAttribute("aria-hidden", "true");
+      btn.append(arrow);
+      btn.addEventListener("click", onClick);
+      return btn;
+    }
+
+    function grid(items, three) {
+      const g = el("div", "card-grid" + (items.length === 4 ? " card-grid--four" : ""));
+      items.forEach((i) => g.append(navCard(i.label, i.onClick)));
+      return g;
+    }
+
+    function set(patch) { Object.assign(state, patch); render(); }
+
+    function goBack() {
+      if (state.view) state.view = null;
+      else if (state.topic) state.topic = null;
+      else if (state.type) state.type = null;
+      else if (state.subject) state.subject = null;
+      else state.exam = null;
+      state.paid = false;
+      render();
+    }
+
+    function actionButton(label, locked, onClick) {
+      const b = el("button", "action-button" + (locked ? " action-button--locked" : ""), label);
+      b.type = "button";
+      if (locked) b.disabled = true;
+      if (onClick) b.addEventListener("click", onClick);
+      return b;
+    }
+
+    function arrow() {
+      const a = el("span", "payment-flow__arrow", "→");
+      a.setAttribute("aria-hidden", "true");
+      return a;
+    }
+
+    function accessPanel() {
+      const panel = el("div", "access-panel");
+      panel.append(el("div", "access-panel__topic", state.topic.name));
+
+      if (state.type === "TEST" && state.topic.paidTest && !state.paid) {
+        const flow = el("div", "payment-flow");
+        const step = el("div", "payment-flow__step");
+        step.append(el("span", "", "FEE"), el("strong", "", "₹" + state.topic.fee));
+        flow.append(
+          step, arrow(),
+          actionButton("PAYMENT", false, () => { state.paid = true; render(); }),
+          arrow(),
+          actionButton("ACCESS", true)
+        );
+        panel.append(flow);
+      } else {
+        panel.append(actionButton("ACCESS", false, () => {
+          if (state.type === "VIDEO") { state.view = "videos"; state.lesson = 0; render(); }
+        }));
+      }
+      return panel;
+    }
+
+    function videoPage() {
+      const lessons = videoLessons[state.topic.name] || [];
+      const wrap = el("div", "video-page");
+
+      const head = el("div", "video-page__head");
+      head.append(el("h2", "video-page__title", state.topic.name),
+                  el("span", "video-page__count", lessons.length + " LESSONS"));
+      wrap.append(head);
+
+      if (!lessons.length) {
+        wrap.append(el("p", "video-empty", "Videos for this topic are coming soon."));
+        return wrap;
+      }
+
+      const current = lessons[state.lesson] || lessons[0];
+      const body = el("div", "video-page__body");
+
+      const left = el("div");
+      const player = el("div", "video-player");
+      if (current.youtubeId) {
+        const frame = document.createElement("iframe");
+        frame.src = "https://www.youtube-nocookie.com/embed/" + current.youtubeId;
+        frame.title = current.title;
+        frame.allow = "accelerometer; encrypted-media; picture-in-picture";
+        frame.allowFullscreen = true;
+        player.append(frame);
+      } else {
+        const empty = el("div", "video-player__empty");
+        empty.append(el("div", "video-player__play", "▶"), el("p", "", "VIDEO COMING SOON"));
+        player.append(empty);
+      }
+      left.append(player, el("p", "video-now", current.title));
+
+      const list = el("div", "lesson-list");
+      lessons.forEach((l, i) => {
+        const b = el("button", "lesson" + (l === current ? " lesson--active" : ""));
+        b.type = "button";
+        b.append(el("span", "lesson__num", String(i + 1)), el("span", "", l.title));
+        if (l.time) b.append(el("span", "lesson__time", l.time));
+        b.addEventListener("click", () => { state.lesson = i; render(); });
+        list.append(b);
+      });
+
+      body.append(left, list);
+      wrap.append(body);
+      return wrap;
+    }
+
+    function render() {
+      root.innerHTML = "";
+
+      if (state.exam) {
+        const bar = el("div", "content__toolbar");
+        const back = el("button", "back-button", "←");
+        back.type = "button";
+        back.setAttribute("aria-label", "Go back");
+        back.addEventListener("click", goBack);
+        bar.append(back);
+        root.append(bar);
+      }
+
+      if (!state.exam) {
+        root.append(grid(Object.keys(curriculum).map((c) => ({
+          label: c, onClick: () => set({ exam: c, type: null, subject: null, topic: null, paid: false }),
+        })), true));
+      } else if (!state.subject) {
+        root.append(grid(curriculum[state.exam].map((sub) => ({
+          label: sub.name, onClick: () => set({ subject: sub, type: null, topic: null, paid: false }),
+        })), true));
+      } else if (!state.type) {
+        root.append(grid(learningTypes.map((t) => ({
+          label: t, onClick: () => set({ type: t, topic: null, paid: false }),
+        })), true));
+      } else if (!state.topic) {
+        root.append(grid(state.subject.topics.map((t) => ({
+          label: t.name, onClick: () => set({ topic: t, paid: false }),
+        })), false));
+      } else {
+        root.append(state.view === "videos" ? videoPage() : accessPanel());
+      }
+    }
+
+    render();
+  </script>
+</body>
+</html>
